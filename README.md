@@ -29,7 +29,7 @@
 - python3 -m venv ./venv
 - source ./venv/bin/activate
 - pip3 install -r requirements.txt
-- buildozer init # Создаст файл buildozer.spec, его следует заполнить, пример в buildozer.spec.example
+- buildozer init # Создаст файл buildozer.spec, его следует заполнить, пример в buildozer.spec.example, советую добавить bin, venv и .buildozer в source.exclude_dirs.
 - buildozer -v android debug
 
 Если всё правильно, в каталоге bin появится apk файл.
