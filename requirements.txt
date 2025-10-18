@@ -1,0 +1,5 @@
+Cython==0.29.33
+virtualenv
+kivy
+buildozer
+setuptools
