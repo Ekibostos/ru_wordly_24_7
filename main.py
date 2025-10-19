@@ -62,7 +62,11 @@ class MyApp(App):
         self.word = ""
         self.buttons = {}
         self.start_new_game()
-        self.field = Label(text=make_matrix_text(self.matrix, self.color_matrix), color='#000000', font_size = '50sp', font_name='mono', markup = True)
+        self.field = Label(text=make_matrix_text(self.matrix, self.color_matrix), 
+                           color='#000000', 
+                           font_size = '50sp', 
+                           font_name='mono', 
+                           markup = True)
 
     def start_new_game(self):
         self.matrix = [["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"]]
@@ -132,11 +136,21 @@ https://github.com/Ekibostos/ru_wordly_24_7
 '''
         content = BoxLayout(orientation='vertical', size=(.5, .5))
         scroll = ScrollView()
-        scroll.add_widget(Label(text=about_text, color='#FFFFFF', padding = 50, size=(Window.width, Window.height), text_size=(Window.width, Window.height), size_hint_y= None))
+        scroll.add_widget(Label(text=about_text, 
+                                color='#FFFFFF', 
+                                padding = 50,
+                                size=(Window.width, Window.height), 
+                                text_size=(Window.width, Window.height), 
+                                size_hint_y=None,
+                                valign='middle'))
         content.add_widget(scroll)
         a = Button(text='Ok', font_size = '15dp', size_hint=[1, .1], padding = 30)
         content.add_widget(a)
-        popup_a = Popup(title='', content=content, auto_dismiss=False, separator_height=0, background_color=(76/255, 94/255, 247/255, 1))
+        popup_a = Popup(title='', 
+                        content=content, 
+                        auto_dismiss=False, 
+                        separator_height=0, 
+                        background_color=(76/255, 94/255, 247/255, 1))
         a.bind(on_press=popup_a.dismiss)
         popup_a.open()
 
@@ -144,11 +158,28 @@ https://github.com/Ekibostos/ru_wordly_24_7
         '''Выводит всплывающее окно с текстом из переменной message
            Текст не должен быть слишком большим, может не войти'''
         content = BoxLayout(orientation='vertical', padding = 30, size=(.5, .5))
-        content.add_widget(Label(text=message, color='#FFFFFF', markup = True, font_name='mono', font_size = '25sp', padding = 50, size=(Window.width, Window.height * .5), text_size=(Window.width, Window.height * .5)))
+        content.add_widget(Label(text=message, 
+                                 color='#FFFFFF', 
+                                 markup = True, 
+                                 font_name='mono', 
+                                 font_size = '25sp', 
+                                 padding = 50, 
+                                 size=(Window.width, Window.height * .5), 
+                                 text_size=(Window.width, Window.height * .5), 
+                                 halign='center', 
+                                 valign='middle'))
         b = Button(text='Ok', font_size = '15dp', size_hint=[1, .16], padding = 30)
         content.add_widget(b)
-        content.add_widget(Button(text='Об игре', font_size = '15dp', size_hint=[1, .1], on_press=self.about, padding = 30))
-        popup = Popup(title='', content=content, auto_dismiss=False, separator_height=0, background_color=(76/255, 94/255, 247/255, 1))
+        content.add_widget(Button(text='Об игре', 
+                                  font_size = '15dp', 
+                                  size_hint=[1, .1], 
+                                  on_press=self.about, 
+                                  padding = 30))
+        popup = Popup(title='', 
+                      content=content, 
+                      auto_dismiss=False, 
+                      separator_height=0, 
+                      background_color=(76/255, 94/255, 247/255, 1))
         b.bind(on_press=popup.dismiss)
         popup.open()
 
