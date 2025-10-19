@@ -226,9 +226,18 @@ https://github.com/Ekibostos/ru_wordly_24_7
 
         l = [["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ"], ["ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э"], ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю"]]
         keyboard = BoxLayout(orientation='vertical', size_hint=[1, .4])
-        row1 = BoxLayout(orientation='horizontal', pos_hint={"center_x": 0.5, "center_y":0.5}, size_hint=(0.95, 1), padding=5)
-        row2 = BoxLayout(orientation='horizontal', pos_hint={"center_x": 0.5, "center_y":0.5}, size_hint=(0.95, 1), padding=5)
-        row3 = BoxLayout(orientation='horizontal', pos_hint={"center_x": 0.5, "center_y":0.5}, size_hint=(0.95, 1), padding=5)
+        row1 = BoxLayout(orientation='horizontal', 
+                         pos_hint={"center_x": 0.5, "center_y":0.5}, 
+                         size_hint=(0.95, 1), 
+                         padding=5)
+        row2 = BoxLayout(orientation='horizontal', 
+                         pos_hint={"center_x": 0.5, "center_y":0.5}, 
+                         size_hint=(0.95, 1), 
+                         padding=5)
+        row3 = BoxLayout(orientation='horizontal', 
+                         pos_hint={"center_x": 0.5, "center_y":0.5}, 
+                         size_hint=(0.95, 1), 
+                         padding=5)
 
 
         for i in l[0]:
