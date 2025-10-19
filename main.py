@@ -54,6 +54,8 @@ def make_matrix_text(matrix, color_matrix):
 class MyApp(App):
     def __init__(self):
         super().__init__()
+        #self.button_backgound_color = (76/255, 94/255, 247/255, 1)
+        self.button_backgound_color = (1, 1, 1, 1)
         self.matrix = []
         self.color_matrix = []
         self.position = [0, 0]
@@ -106,7 +108,7 @@ class MyApp(App):
         l = ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю"]
         for i in l:
             try:
-                self.buttons[i].background_color = [1, 1, 1, 1]
+                self.buttons[i].background_color = self.button_backgound_color
             except:
                 pass
 
@@ -144,20 +146,20 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                 size_hint_y=None,
                                 valign='middle'))
         content.add_widget(scroll)
-        a = Button(text='Ok', font_size = '15dp', size_hint=[1, .1], padding = 30)
+        a = Button(text='Ok', font_size = '15dp', size_hint=[1, .1], padding = 30, background_color=self.button_backgound_color)
         content.add_widget(a)
         popup_a = Popup(title='', 
                         content=content, 
                         auto_dismiss=False, 
                         separator_height=0, 
-                        background_color=(76/255, 94/255, 247/255, 1))
+                        background_color=(153/255, 205/255, 255/255, 1))
         a.bind(on_press=popup_a.dismiss)
         popup_a.open()
 
     def notify(self, message):
         '''Выводит всплывающее окно с текстом из переменной message
            Текст не должен быть слишком большим, может не войти'''
-        content = BoxLayout(orientation='vertical', padding = 30, size=(.5, .5))
+        content = BoxLayout(orientation='vertical', size=(.5, .5))
         content.add_widget(Label(text=message, 
                                  color='#FFFFFF', 
                                  markup = True, 
@@ -168,18 +170,25 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                  text_size=(Window.width, Window.height * .5), 
                                  halign='center', 
                                  valign='middle'))
-        b = Button(text='Ok', font_size = '15dp', size_hint=[1, .16], padding = 30)
-        content.add_widget(b)
-        content.add_widget(Button(text='Об игре', 
-                                  font_size = '15dp', 
-                                  size_hint=[1, .1], 
+        b = Button(text='Ok', 
+                   font_size = '15dp',
+                   background_color=self.button_backgound_color,
+                   pos_hint={"center_x": 0.5, "center_y":0.5})
+        b_box = BoxLayout(orientation='vertical', size_hint=[1, .16], padding = 5)
+        b_box.add_widget(b)
+        content.add_widget(b_box)
+        a_box = BoxLayout(orientation='vertical', size_hint=[1, .1], padding = 5)
+        a_box.add_widget(Button(text='Об игре', 
+                                  font_size = '15dp',
                                   on_press=self.about, 
-                                  padding = 30))
+                                  background_color=self.button_backgound_color,
+                                  pos_hint={"center_x": 0.5, "center_y":0.5}))
+        content.add_widget(a_box)
         popup = Popup(title='', 
                       content=content, 
                       auto_dismiss=False, 
                       separator_height=0, 
-                      background_color=(76/255, 94/255, 247/255, 1))
+                      background_color=(153/255, 205/255, 255/255, 1))
         b.bind(on_press=popup.dismiss)
         popup.open()
 
@@ -188,7 +197,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
            Вся логика и проверки тут.'''
         input_word = ''.join(self.matrix[self.position[0]])
         if input_word not in self.ex_words:
-            self.notify('Такого слова нет в русском языке.\nСотрите и введите другое!')
+            self.notify('Такого слова нет.\nПопробуйте другое!')
         elif input_word == self.word:
             # Красим всю строку с правильным словом
             self.color_matrix[self.position[0]] = ['g', 'g', 'g', 'g', 'g']
@@ -241,17 +250,17 @@ https://github.com/Ekibostos/ru_wordly_24_7
 
 
         for i in l[0]:
-            row1.add_widget(Button(text=i, size_hint=[0.95, 1], on_press=self.litera, font_size = '30sp'))
+            row1.add_widget(Button(text=i, size_hint=[0.95, 1], on_press=self.litera, font_size = '30sp', background_color=self.button_backgound_color))
 
         for i in l[1]:
-            row2.add_widget(Button(text=i, size_hint=[0.95, 1], on_press=self.litera, font_size = '30sp'))
+            row2.add_widget(Button(text=i, size_hint=[0.95, 1], on_press=self.litera, font_size = '30sp', background_color=self.button_backgound_color))
 
-        row3.add_widget(Button(text="<-", size_hint=[1.2, 1], on_press=self.backspace, font_size = '35sp'))
+        row3.add_widget(Button(text="<-", size_hint=[1.2, 1], on_press=self.backspace, font_size = '35sp', background_color=self.button_backgound_color))
 
         for i in l[2]:
-            row3.add_widget(Button(text=i, size_hint=[0.95, 1], on_press=self.litera, font_size = '30sp'))
+            row3.add_widget(Button(text=i, size_hint=[0.95, 1], on_press=self.litera, font_size = '30sp', background_color=self.button_backgound_color))
 
-        row3.add_widget(Button(text="Ввод", size_hint=[1.6, 1], on_press=self.enter, font_size = '20sp'))
+        row3.add_widget(Button(text="Ввод", size_hint=[1.6, 1], on_press=self.enter, font_size = '20sp', background_color=self.button_backgound_color))
 
         keyboard.add_widget(row1)
         keyboard.add_widget(row2)
