@@ -61,6 +61,15 @@ def make_matrix_text(matrix, color_matrix):
         m.append(' '.join(n))
     return '\n'.join(m)
 
+def make_clear_matrix():
+    m =[]
+    for x in range(6):
+        n = []
+        for y in range(5):
+            n.append('_')
+        m.append(n)
+    return m
+
 
 class MyApp(App):
     def __init__(self):
@@ -91,8 +100,8 @@ class MyApp(App):
         self.start_new_game()
 
     def start_new_game(self):
-        self.matrix = [["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"], ["_", "_", "_", "_", "_"]]
-        self.color_matrix = [["n", "n", "n", "n", "n"], ["n", "n", "n", "n", "n"], ["n", "n", "n", "n", "n"], ["n", "n", "n", "n", "n"], ["n", "n", "n", "n", "n"], ["n", "n", "n", "n", "n"]]
+        self.matrix = make_clear_matrix()
+        self.color_matrix = make_clear_matrix()
         self.position = [0, 0]
         all_words = get_all_words()
         self.words = all_words["words"]
@@ -129,8 +138,12 @@ class MyApp(App):
             pass
 
     def clear_all_buttons(self):
-        '''Убирает цвет со всех кнопок'''
-        l = ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю"]
+        '''Возвращает дефолтный цвет всем кнопкам'''
+        l = ["й", "ц", "у", "к", "е", "н", "г", 
+             "ш", "щ", "з", "х", "ъ", "ф", "ы", 
+             "в", "а", "п", "р", "о", "л", "д", 
+             "ж", "э", "я", "ч", "с", "м", "и", 
+             "т", "ь", "б", "ю"]
         for i in l:
             try:
                 self.buttons[i].background_color = self.button_backgound_color
@@ -144,28 +157,34 @@ class MyApp(App):
             self.matrix[self.position[0]][self.position[1]] = '_'
         self.update_field()
 
-    def on_active(self, instance, value):
+    def set_easy_level(self, instance, value):
+        '''Меняет уровень сложности'''
         if value:
             Config.set('settings', 'easy_level', '1')
             with open('my.ini', 'w') as configfile:
                 Config.write(configfile)
+            self.easy = True
             self.start_new_game()
         else:
             Config.set('settings', 'easy_level', '0')
             with open('my.ini', 'w') as configfile:
                 Config.write(configfile)
+            self.easy = False
             self.start_new_game()
     
     def set_left_enter(self, instance, value):
+        '''Меняет местами кнопки ввод и стереть'''
         if value:
             Config.set('settings', 'left_enter', '1')
             with open('my.ini', 'w') as configfile:
                 Config.write(configfile)
+            self.left_enter = True
             self.start_new_game()
         else:
             Config.set('settings', 'left_enter', '0')
             with open('my.ini', 'w') as configfile:
                 Config.write(configfile)
+            self.left_enter = False
             self.start_new_game()
 
     def rules(self, *args):
@@ -205,7 +224,12 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                 size_hint_y=None,
                                 valign='middle'))
         content.add_widget(scroll)
-        a = Button(text='Ok', font_size = '15dp', size_hint=[1, .1], padding = 30, background_color=self.button_backgound_color, background_normal='')
+        a = Button(text='Ok', 
+                   font_size = '15dp', 
+                   size_hint=[1, .1], 
+                   padding = 30, 
+                   background_color=self.button_backgound_color, 
+                   background_normal='')
         content.add_widget(a)
         popup_a = Popup(title='', 
                       content=content, 
@@ -251,14 +275,39 @@ https://github.com/Ekibostos/ru_wordly_24_7
         popup.open()
 
     def menu(self, *args):
+        '''Сюда запихал всё что ни попадя
+        Все пункты в отдельном BoxLayout, иначе разъедутся.'''
         content = BoxLayout(orientation='vertical', size=(.5, .5))
-        b = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
-        exit = Button(text='Закрыть меню', 
-                   font_size = '15dp',
-                   background_color=self.button_backgound_color,
-                   background_normal='',
-                   pos_hint={"center_x": 0.5, "center_y":0.5})
-        b.add_widget(exit)
+
+        # Тумблер переключалка уровня сложности
+        с_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
+        с_box.add_widget(Label(text='Лёгкий режим', size_hint=[.7, 1]))
+        sw1 = Switch(active=self.easy)
+        sw1.bind(active=self.set_easy_level)
+        с_box.add_widget(sw1)
+        content.add_widget(с_box)
+        content.add_widget(Label(text='В лёгком режиме будут загадываться более распространенные слова', 
+                                 color='#FFFFFF',
+                                 size_hint=[1, .12],
+                                 text_size=(Window.width * .7, Window.height * .07), 
+                                 halign='center', 
+                                 valign='middle'))
+
+        # Тумблер меняющий местами кнопки ввод и стереть
+        e_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
+        e_box.add_widget(Label(text='Кнопка ввода слева', size_hint=[.7, 1]))
+        sw2 = Switch(active=self.left_enter)
+        sw2.bind(active=self.set_left_enter)
+        e_box.add_widget(sw2)
+        content.add_widget(e_box)
+        content.add_widget(Label(text='Кнопки ввод и стереть поменяются местами\nПотребуется перезапустить приложение', 
+                                 color='#FFFFFF',
+                                 size_hint=[1, .12],
+                                 text_size=(Window.width * .7, Window.height * .07), 
+                                 halign='center', 
+                                 valign='middle'))
+
+        # Кнопка вызывает окно с правилами игры
         a_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
         a_box.add_widget(Button(text='Правила', 
                                   font_size = '15dp',
@@ -266,6 +315,9 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                   background_color=self.button_backgound_color,
                                   background_normal='',
                                   pos_hint={"center_x": 0.5, "center_y":0.5}))
+        content.add_widget(a_box)
+        
+        # Кнопка вызывает окно с инфомацией об игре
         b_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
         b_box.add_widget(Button(text='Об игре', 
                                   font_size = '15dp',
@@ -273,33 +325,19 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                   background_color=self.button_backgound_color,
                                   background_normal='',
                                   pos_hint={"center_x": 0.5, "center_y":0.5}))
-        с_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
-        с_box.add_widget(Label(text='Лёгкий режим', size_hint=[.7, 1]))
-        sw1 = Switch(active=self.easy)
-        sw1.bind(active=self.on_active)
-        с_box.add_widget(sw1)
-        e_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
-        e_box.add_widget(Label(text='Кнопка ввода слева', size_hint=[.7, 1]))
-        sw2 = Switch(active=self.left_enter)
-        sw2.bind(active=self.set_left_enter)
-        e_box.add_widget(sw2)
-        content.add_widget(с_box)
-        content.add_widget(Label(text='В лёгком режиме юудут загадываться более распространенные слова', 
-                                 color='#FFFFFF',
-                                 size_hint=[1, .05],
-                                 text_size=(Window.width * .7, Window.height * .07), 
-                                 halign='center', 
-                                 valign='middle'))
-        content.add_widget(e_box)
-        content.add_widget(Label(text='Кнопки ввод и стереть поменяются местами.\nПотребуется перезапустить приложение.', 
-                                 color='#FFFFFF',
-                                 size_hint=[1, .05],
-                                 text_size=(Window.width * .7, Window.height * .07), 
-                                 halign='center', 
-                                 valign='middle'))
-        content.add_widget(a_box)
         content.add_widget(b_box)
+
+        # Кнопка закрыть меню
+        b = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
+        exit = Button(text='Закрыть меню', 
+                   font_size = '15dp',
+                   background_color=self.button_backgound_color,
+                   background_normal='',
+                   pos_hint={"center_x": 0.5, "center_y":0.5})
+        b.add_widget(exit)
         content.add_widget(b)
+
+        # Само всплывающее окно
         popup = Popup(title='', 
                       content=content, 
                       auto_dismiss=False, 
@@ -350,6 +388,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         '''Основной метод для построения программы'''
         interface = BoxLayout(orientation='vertical')
 
+        # Рисуем верхнее меню, кнопки без фона, текст везде чёрный
         top_line = BoxLayout(orientation='horizontal', size_hint=[1, .1])
         rules_button = Button(text='Правила',
                               color = '#000000',
@@ -371,23 +410,22 @@ https://github.com/Ekibostos/ru_wordly_24_7
                               background_normal='')
         top_line.add_widget(menu_button)
 
-        l = [["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ"], ["ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э"], ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю"]]
+        # Рисуем клавиатуру тремя рядами, каждый ряд отдельный BoxLayout
         keyboard = BoxLayout(orientation='vertical', size_hint=[1, .4])
-        row1 = BoxLayout(orientation='horizontal', 
+        line1 = BoxLayout(orientation='horizontal', 
                          pos_hint={"center_x": 0.5, "center_y":0.5}, 
                          size_hint=(0.95, 1), 
                          padding=5)
-        row2 = BoxLayout(orientation='horizontal', 
+        line2 = BoxLayout(orientation='horizontal', 
                          pos_hint={"center_x": 0.5, "center_y":0.5}, 
                          size_hint=(0.95, 1), 
                          padding=5)
-        row3 = BoxLayout(orientation='horizontal', 
+        line3 = BoxLayout(orientation='horizontal', 
                          pos_hint={"center_x": 0.5, "center_y":0.5}, 
                          size_hint=(0.95, 1), 
                          padding=5)
 
-
-        for i in l[0]:
+        for i in ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ"]:
             tmp = BoxLayout(orientation='horizontal', padding=1)
             tmp.add_widget(Button(text=i, 
                                   size_hint=[0.95, 1], 
@@ -395,9 +433,9 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                   font_size = '30sp', 
                                   background_color=self.button_backgound_color, 
                                   background_normal=''))
-            row1.add_widget(tmp)
+            line1.add_widget(tmp)
 
-        for i in l[1]:
+        for i in ["ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э"]:
             tmp = BoxLayout(orientation='horizontal', padding=1)
             tmp.add_widget(Button(text=i, 
                                   size_hint=[0.95, 1], 
@@ -405,14 +443,15 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                   font_size = '30sp', 
                                   background_color=self.button_backgound_color, 
                                   background_normal=''))
-            row2.add_widget(tmp)
+            line2.add_widget(tmp)
 
         tmp_b = BoxLayout(orientation='horizontal', 
                           size_hint=[1.2, 1], 
                           padding=1)
-        tmp_b.add_widget(Button(text="<-", 
+        tmp_b.add_widget(Button(text="⌫", 
                                 on_press=self.backspace, 
                                 font_size = '35sp', 
+                                font_name='mono',
                                 background_color=self.button_backgound_color, 
                                 background_normal=''))
         tmp_e = BoxLayout(orientation='horizontal', 
@@ -428,9 +467,9 @@ https://github.com/Ekibostos/ru_wordly_24_7
             tmp_b, tmp_e = tmp_e, tmp_b
 
 
-        row3.add_widget(tmp_b)
+        line3.add_widget(tmp_b)
 
-        for i in l[2]:
+        for i in ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю"]:
             tmp = BoxLayout(orientation='horizontal', padding=1)
             tmp.add_widget(Button(text=i, 
                                   size_hint=[0.95, 1], 
@@ -438,14 +477,15 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                   font_size = '30sp', 
                                   background_color=self.button_backgound_color, 
                                   background_normal=''))
-            row3.add_widget(tmp)
+            line3.add_widget(tmp)
 
-        row3.add_widget(tmp_e)
+        line3.add_widget(tmp_e)
 
-        keyboard.add_widget(row1)
-        keyboard.add_widget(row2)
-        keyboard.add_widget(row3)
+        keyboard.add_widget(line1)
+        keyboard.add_widget(line2)
+        keyboard.add_widget(line3)
 
+        # Добавляем элементы в интерфейс
         interface.add_widget(top_line)
         interface.add_widget(self.field)
         interface.add_widget(keyboard)
