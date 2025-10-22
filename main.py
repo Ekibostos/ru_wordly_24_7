@@ -9,6 +9,8 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.switch import Switch
+from kivy import platform
+from kivy.base import EventLoop
 from kivy.core.window import Window
 
 # Глобальные настройки
@@ -18,6 +20,12 @@ Window.title = "Ru_Wordly_24/7"
 Config = configparser.ConfigParser()
 Config.read("my.ini")
 
+if platform == 'android':
+    from jnius import autoclass
+
+    Intent = autoclass("android.content.Intent")
+    PythonActivity = autoclass("org.kivy.android.PythonActivity")
+    System = autoclass("java.lang.System")
 
 def get_all_words():
     '''Читает файлы со списками слов.
@@ -75,7 +83,7 @@ class MyApp(App):
     def __init__(self):
         super().__init__()
         self.button_backgound_color = (0/255, 87/255, 111/255, 1)
-        #self.button_backgound_color = (1, 1, 1, 1)
+        self.literas = {}
         self.matrix = []
         self.color_matrix = []
         self.position = [0, 0]
@@ -91,7 +99,6 @@ class MyApp(App):
         self.ex_words = ""
         self.word = ""
         self.easy_words = ""
-        self.buttons = {}
         self.field = Label(text=make_matrix_text(self.matrix, self.color_matrix), 
                            color='#000000', 
                            font_size = '50sp', 
@@ -116,7 +123,7 @@ class MyApp(App):
 
     def litera(self, instanse):
         '''Обрабатывает нажатия на кнопки с буквами'''
-        self.buttons[instanse.text] = instanse
+        self.literas[instanse.text] = instanse
         if self.position[1] < 5:
             self.matrix[self.position[0]][self.position[1]] = instanse.text
             self.position[1] = self.position[1] + 1
@@ -124,16 +131,16 @@ class MyApp(App):
 
     def color_button(self, button, color):
         '''Красит кнопки на клавиатуре'''
-        color_now = self.buttons[button].background_color
+        color_now = self.literas[button].background_color
         # Проверка нужна чтоб не перекрасить зелёную кнопку в желтую))
         if color_now == [0.0, 0.7176470588235294, 0.1607843137254902, 1.0]:
             return
         if color == 'b':
-            self.buttons[button].background_color = '000000'
+            self.literas[button].background_color = '000000'
         elif color == 'y':
-            self.buttons[button].background_color = 'fbbd05'
+            self.literas[button].background_color = 'fbbd05'
         elif color == 'g':
-            self.buttons[button].background_color = '00b729'
+            self.literas[button].background_color = '00b729'
         else:
             pass
 
@@ -146,7 +153,7 @@ class MyApp(App):
              "т", "ь", "б", "ю"]
         for i in l:
             try:
-                self.buttons[i].background_color = self.button_backgound_color
+                self.literas[i].background_color = self.button_backgound_color
             except:
                 pass
 
@@ -180,12 +187,27 @@ class MyApp(App):
                 Config.write(configfile)
             self.left_enter = True
             self.start_new_game()
+            self.restart()
         else:
             Config.set('settings', 'left_enter', '0')
             with open('my.ini', 'w') as configfile:
                 Config.write(configfile)
             self.left_enter = False
             self.start_new_game()
+            self.restart()
+    
+    def restart(self, *args):
+        if platform == 'android':
+            activity = PythonActivity.mActivity
+            intent = Intent(activity.getApplicationContext(), PythonActivity)
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            activity.startActivity(intent)
+            System.exit(0)
+        else:
+            self.root.clear_widgets()
+            self.stop()
+            MyApp().run()
 
     def rules(self, *args):
         '''Всплывающее окно с правилами игры
@@ -233,7 +255,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         content.add_widget(a)
         popup_a = Popup(title='', 
                       content=content, 
-                      auto_dismiss=False, 
+                      auto_dismiss=True, 
                       separator_height=0, 
                       size=(Window.width * .8, Window.height * .8), 
                       size_hint=(None, None),
@@ -265,7 +287,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         content.add_widget(b_box)
         popup = Popup(title='', 
                       content=content, 
-                      auto_dismiss=False, 
+                      auto_dismiss=True, 
                       separator_height=0, 
                       size=(Window.width * .8, Window.height * .8), 
                       size_hint=(None, None),
@@ -300,7 +322,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         sw2.bind(active=self.set_left_enter)
         e_box.add_widget(sw2)
         content.add_widget(e_box)
-        content.add_widget(Label(text='Кнопки ввод и стереть поменяются местами\nПотребуется перезапустить приложение', 
+        content.add_widget(Label(text='Кнопки ввод и стереть поменяются местами\nПриложение перезапустится.', 
                                  color='#FFFFFF',
                                  size_hint=[1, .12],
                                  text_size=(Window.width * .7, Window.height * .07), 
@@ -340,7 +362,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         # Само всплывающее окно
         popup = Popup(title='', 
                       content=content, 
-                      auto_dismiss=False, 
+                      auto_dismiss=True, 
                       separator_height=0, 
                       size=(Window.width * .8, Window.height * .8), 
                       size_hint=(None, None),
@@ -384,8 +406,83 @@ https://github.com/Ekibostos/ru_wordly_24_7
         '''Перерисовывает интерфейс'''
         self.field.text = make_matrix_text(self.matrix, self.color_matrix)
 
+    def on_key_down(self, window, key, *largs):
+        '''Функция для поддердки аппаратной клавиатуры'''
+        match key:
+            case 113 | 1081:
+                self.litera(self.literas['й'])
+            case 119 | 1094:
+                self.litera(self.literas['ц'])
+            case 101 | 1091:
+                self.litera(self.literas['у'])
+            case 114 | 1082:
+                self.litera(self.literas['к'])
+            case 116 | 1077:
+                self.litera(self.literas['е'])
+            case 121 | 1085:
+                self.litera(self.literas['н'])
+            case 117 | 1075:
+                self.litera(self.literas['г'])
+            case 105 | 1096:
+                self.litera(self.literas['ш'])
+            case 111 | 1097:
+                self.litera(self.literas['щ'])
+            case 112 | 1079:
+                self.litera(self.literas['з'])
+            case 91 | 1093:
+                self.litera(self.literas['х'])
+            case 93 | 1098:
+                self.litera(self.literas['ъ'])
+            case 97 | 1092:
+                self.litera(self.literas['ф'])
+            case 115 | 1099:
+                self.litera(self.literas['ы'])
+            case 100 | 1074:
+                self.litera(self.literas['в'])
+            case 102 | 1072:
+                self.litera(self.literas['а'])
+            case 103 | 1087:
+                self.litera(self.literas['п'])
+            case 104 | 1088:
+                self.litera(self.literas['р'])
+            case 106 | 1086:
+                self.litera(self.literas['о'])
+            case 107 | 1083:
+                self.litera(self.literas['л'])
+            case 108 | 1076:
+                self.litera(self.literas['д'])
+            case 59 | 1078:
+                self.litera(self.literas['ж'])
+            case 39 | 1101:
+                self.litera(self.literas['э'])
+            case 122 | 1103:
+                self.litera(self.literas['я'])
+            case 120 | 1095:
+                self.litera(self.literas['ч'])
+            case 99 | 1089:
+                self.litera(self.literas['с'])
+            case 118 | 1084:
+                self.litera(self.literas['м'])
+            case 98 | 1080:
+                self.litera(self.literas['и'])
+            case 110 | 1090:
+                self.litera(self.literas['т'])
+            case 109 | 1100:
+                self.litera(self.literas['ь'])
+            case 44 | 1073:
+                self.litera(self.literas['б'])
+            case 46 | 1102:
+                self.litera(self.literas['ю'])
+            case 13:
+                self.enter(0)
+            case 8:
+                self.backspace(0)
+            case 27:
+                return False
+
     def build(self):
         '''Основной метод для построения программы'''
+        EventLoop.window.bind(on_keyboard=self.on_key_down)
         interface = BoxLayout(orientation='vertical')
 
         # Рисуем верхнее меню, кнопки без фона, текст везде чёрный
@@ -411,38 +508,42 @@ https://github.com/Ekibostos/ru_wordly_24_7
         top_line.add_widget(menu_button)
 
         # Рисуем клавиатуру тремя рядами, каждый ряд отдельный BoxLayout
-        keyboard = BoxLayout(orientation='vertical', size_hint=[1, .4])
+        keyboard = BoxLayout(orientation='vertical', size_hint=[1, .45])
         line1 = BoxLayout(orientation='horizontal', 
                          pos_hint={"center_x": 0.5, "center_y":0.5}, 
-                         size_hint=(0.95, 1), 
-                         padding=5)
+                         size_hint=(.98, 1), 
+                         padding=1)
         line2 = BoxLayout(orientation='horizontal', 
                          pos_hint={"center_x": 0.5, "center_y":0.5}, 
-                         size_hint=(0.95, 1), 
-                         padding=5)
+                         size_hint=(.98, 1), 
+                         padding=1)
         line3 = BoxLayout(orientation='horizontal', 
                          pos_hint={"center_x": 0.5, "center_y":0.5}, 
-                         size_hint=(0.95, 1), 
-                         padding=5)
+                         size_hint=(.98, 1), 
+                         padding=1)
 
         for i in ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ"]:
             tmp = BoxLayout(orientation='horizontal', padding=1)
-            tmp.add_widget(Button(text=i, 
-                                  size_hint=[0.95, 1], 
-                                  on_press=self.litera, 
-                                  font_size = '30sp', 
-                                  background_color=self.button_backgound_color, 
-                                  background_normal=''))
+            b = Button(text=i, 
+                       size_hint=[1, 1], 
+                       on_press=self.litera, 
+                       font_size = '30sp', 
+                       background_color=self.button_backgound_color, 
+                       background_normal='')
+            tmp.add_widget(b)
+            self.literas[i] = b
             line1.add_widget(tmp)
 
         for i in ["ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э"]:
             tmp = BoxLayout(orientation='horizontal', padding=1)
-            tmp.add_widget(Button(text=i, 
-                                  size_hint=[0.95, 1], 
-                                  on_press=self.litera, 
-                                  font_size = '30sp', 
-                                  background_color=self.button_backgound_color, 
-                                  background_normal=''))
+            b = Button(text=i, 
+                       size_hint=[1, 1], 
+                       on_press=self.litera, 
+                       font_size = '30sp', 
+                       background_color=self.button_backgound_color, 
+                       background_normal='')
+            tmp.add_widget(b)
+            self.literas[i] = b
             line2.add_widget(tmp)
 
         tmp_b = BoxLayout(orientation='horizontal', 
@@ -471,12 +572,14 @@ https://github.com/Ekibostos/ru_wordly_24_7
 
         for i in ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю"]:
             tmp = BoxLayout(orientation='horizontal', padding=1)
-            tmp.add_widget(Button(text=i, 
-                                  size_hint=[0.95, 1], 
-                                  on_press=self.litera, 
-                                  font_size = '30sp', 
-                                  background_color=self.button_backgound_color, 
-                                  background_normal=''))
+            b = Button(text=i, 
+                       size_hint=[1, 1], 
+                       on_press=self.litera, 
+                       font_size = '30sp', 
+                       background_color=self.button_backgound_color, 
+                       background_normal='')
+            tmp.add_widget(b)
+            self.literas[i] = b
             line3.add_widget(tmp)
 
         line3.add_widget(tmp_e)
