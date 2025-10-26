@@ -29,7 +29,7 @@ if platform == 'android':
 
 def get_all_words():
     '''Читает файлы со списками слов.
-       Возврашайт картеж содержащий 2 спмска слов.'''
+       Возврашайт картеж содержащий 3 спмска слов.'''
     row_words = open('russian_used.txt', 'r') # Часто используемые слова
 
     words = []
@@ -101,7 +101,7 @@ class MyApp(App):
         self.easy_words = ""
         self.field = Label(text=make_matrix_text(self.matrix, self.color_matrix), 
                            color='#000000', 
-                           font_size = '50sp', 
+                           font_size = Window.width / 7, 
                            font_name='mono', 
                            markup = True)
         self.start_new_game()
@@ -231,6 +231,8 @@ class MyApp(App):
            Выводит текст в окне с полосой прокрутки.'''
         about_text='''
 https://github.com/Ekibostos/ru_wordly_24_7
+
+Пункт в доработке
 '''
         self.scroll_notify(about_text)
     
@@ -241,13 +243,14 @@ https://github.com/Ekibostos/ru_wordly_24_7
         scroll.add_widget(Label(text=message, 
                                 color='#FFFFFF', 
                                 padding = 30,
+                                font_size = Window.width / 30,
                                 size=(Window.width * .8, Window.height * .8), 
                                 text_size=(Window.width * .8, Window.height * .8), 
                                 size_hint_y=None,
                                 valign='middle'))
         content.add_widget(scroll)
         a = Button(text='Ok', 
-                   font_size = '15dp', 
+                   font_size = Window.width / 20, 
                    size_hint=[1, .1], 
                    padding = 30, 
                    background_color=self.button_backgound_color, 
@@ -272,13 +275,13 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                  color='#FFFFFF', 
                                  markup = True, 
                                  font_name='mono', 
-                                 font_size = '25sp', 
+                                 font_size = Window.width / 16, 
                                  size=(Window.width * .8, Window.height * .8), 
                                  text_size=(Window.width * .8, Window.height * .8), 
                                  halign='center', 
                                  valign='middle'))
         b = Button(text='Ok', 
-                   font_size = '15dp',
+                   font_size = Window.width / 20,
                    background_color=self.button_backgound_color,
                    background_normal='',
                    pos_hint={"center_x": 0.5, "center_y":0.5})
@@ -303,7 +306,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
 
         # Тумблер переключалка уровня сложности
         с_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
-        с_box.add_widget(Label(text='Лёгкий режим', size_hint=[.7, 1]))
+        с_box.add_widget(Label(text='Лёгкий режим', font_size = Window.width / 28, size_hint=[.7, 1]))
         sw1 = Switch(active=self.easy)
         sw1.bind(active=self.set_easy_level)
         с_box.add_widget(sw1)
@@ -312,12 +315,13 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                  color='#FFFFFF',
                                  size_hint=[1, .12],
                                  text_size=(Window.width * .7, Window.height * .07), 
+                                 font_size = Window.width / 35,
                                  halign='center', 
                                  valign='middle'))
 
         # Тумблер меняющий местами кнопки ввод и стереть
         e_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
-        e_box.add_widget(Label(text='Кнопка ввода слева', size_hint=[.7, 1]))
+        e_box.add_widget(Label(text='Кнопка ввода слева', font_size = Window.width / 28, size_hint=[.7, 1]))
         sw2 = Switch(active=self.left_enter)
         sw2.bind(active=self.set_left_enter)
         e_box.add_widget(sw2)
@@ -326,13 +330,14 @@ https://github.com/Ekibostos/ru_wordly_24_7
                                  color='#FFFFFF',
                                  size_hint=[1, .12],
                                  text_size=(Window.width * .7, Window.height * .07), 
+                                 font_size = Window.width / 35,
                                  halign='center', 
                                  valign='middle'))
 
         # Кнопка вызывает окно с правилами игры
         a_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
         a_box.add_widget(Button(text='Правила', 
-                                  font_size = '15dp',
+                                  font_size = Window.width / 25,
                                   on_press=self.rules,
                                   background_color=self.button_backgound_color,
                                   background_normal='',
@@ -342,7 +347,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         # Кнопка вызывает окно с инфомацией об игре
         b_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
         b_box.add_widget(Button(text='Об игре', 
-                                  font_size = '15dp',
+                                  font_size = Window.width / 25,
                                   on_press=self.about,
                                   background_color=self.button_backgound_color,
                                   background_normal='',
@@ -352,7 +357,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
         # Кнопка закрыть меню
         b = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
         exit = Button(text='Закрыть меню', 
-                   font_size = '15dp',
+                   font_size = Window.width / 25,
                    background_color=self.button_backgound_color,
                    background_normal='',
                    pos_hint={"center_x": 0.5, "center_y":0.5})
@@ -489,18 +494,21 @@ https://github.com/Ekibostos/ru_wordly_24_7
         top_line = BoxLayout(orientation='horizontal', size_hint=[1, .1])
         rules_button = Button(text='Правила',
                               color = '#000000',
+                              font_size = Window.width / 28,
                               size_hint=[.3, 1], 
                               on_press=self.rules, 
                               background_color=(236/255, 242/255, 245/255, 1),
                               background_normal='')
         top_line.add_widget(rules_button)
         top_line.add_widget(Label(text='Ru Wordly', 
-                                 color='#000000',
-                                 font_name='mono',
-                                 halign='center', 
-                                 valign='middle'))
+                                  font_size = Window.width / 28,
+                                  color='#000000',
+                                  font_name='mono',
+                                  halign='center', 
+                                  valign='middle'))
         menu_button = Button(text='Меню',
                               color = '#000000',
+                              font_size = Window.width / 28,
                               size_hint=[.3, 1], 
                               on_press=self.menu, 
                               background_color=(236/255, 242/255, 245/255, 1),
@@ -527,7 +535,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
             b = Button(text=i, 
                        size_hint=[1, 1], 
                        on_press=self.litera, 
-                       font_size = '30sp', 
+                       font_size = Window.width / 16,
                        background_color=self.button_backgound_color, 
                        background_normal='')
             tmp.add_widget(b)
@@ -539,7 +547,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
             b = Button(text=i, 
                        size_hint=[1, 1], 
                        on_press=self.litera, 
-                       font_size = '30sp', 
+                       font_size = Window.width / 16,
                        background_color=self.button_backgound_color, 
                        background_normal='')
             tmp.add_widget(b)
@@ -551,7 +559,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
                           padding=1)
         tmp_b.add_widget(Button(text="⌫", 
                                 on_press=self.backspace, 
-                                font_size = '35sp', 
+                                font_size = Window.width / 20,
                                 font_name='mono',
                                 background_color=self.button_backgound_color, 
                                 background_normal=''))
@@ -560,7 +568,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
                           padding=1)
         tmp_e.add_widget(Button(text="Ввод", 
                                 on_press=self.enter, 
-                                font_size = '20sp', 
+                                font_size = Window.width / 20,
                                 background_color=self.button_backgound_color, 
                                 background_normal=''))
         
@@ -575,7 +583,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
             b = Button(text=i, 
                        size_hint=[1, 1], 
                        on_press=self.litera, 
-                       font_size = '30sp', 
+                       font_size = Window.width / 16,
                        background_color=self.button_backgound_color, 
                        background_normal='')
             tmp.add_widget(b)
