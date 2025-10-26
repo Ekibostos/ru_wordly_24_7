@@ -100,8 +100,8 @@ class MyApp(App):
         self.word = ""
         self.easy_words = ""
         self.field = Label(text=make_matrix_text(self.matrix, self.color_matrix), 
-                           color='#000000', 
-                           font_size = Window.width / 7, 
+                           color='#555555', 
+                           font_size = Window.width / 7.5, 
                            font_name='mono', 
                            markup = True)
         self.start_new_game()
@@ -217,6 +217,7 @@ class MyApp(App):
 После каждой попытки цвет букв будет меняться, чтобы показать, какие буквы есть в загаданном слове!
 Если буква есть в загаданном слове, но стоит в другом месте, цвет будет желтый.
 Если буква есть в загаданном слове и стоит на правильном месте, её цвет будет зелёным.
+Буквы которых точно нет в загаданном слове выднляются чёрным.
 
 Загадываются существительные в единственном числе.
 
@@ -397,6 +398,7 @@ https://github.com/Ekibostos/ru_wordly_24_7
                     self.color_matrix[self.position[0]][i] = 'y'
                     self.color_button(input_word[i], 'y')
                 else:
+                    self.color_matrix[self.position[0]][i] = 'b'
                     self.color_button(input_word[i], 'b')
 
             if self.position[0] < 5:
