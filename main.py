@@ -14,6 +14,8 @@ from kivy.base import EventLoop
 from kivy.core.window import Window
 
 # Глобальные настройки
+if platform != 'android':
+    Window.size = (500, 900)
 Window.clearcolor = (236/255, 242/255, 245/255, 1)
 Window.title = "Ru_Wordly_24/7"
 
