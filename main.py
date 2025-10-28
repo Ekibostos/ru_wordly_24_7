@@ -1,6 +1,7 @@
 # Импорт всех классов
 import random
 import configparser
+import webbrowser
 
 from kivy.app import App
 from kivy.uix.label import Label
@@ -230,14 +231,12 @@ class MyApp(App):
         self.scroll_notify(about_text)
 
     def about(self, *args):
-        '''Всплывающее окно с текстом "Об игре"
-           Выводит текст в окне с полосой прокрутки.'''
-        about_text='''
-https://github.com/Ekibostos/ru_wordly_24_7
-
-Пункт в доработке
-'''
-        self.scroll_notify(about_text)
+        '''Открывает в браузере ссылку на github'''
+        webbrowser.open_new('https://github.com/Ekibostos/ru_wordly_24_7')
+    
+    def license(self, *args):
+        '''Открывает в браузере ссылку на github'''
+        webbrowser.open_new('https://github.com/Ekibostos/ru_wordly_24_7/blob/main/LICENSE')
     
     def scroll_notify(self, message):
         '''Выводит текст в окне с полосой прокрутки.'''
@@ -339,9 +338,9 @@ https://github.com/Ekibostos/ru_wordly_24_7
 
         # Кнопка вызывает окно с правилами игры
         a_box = BoxLayout(orientation='horizontal', size_hint=[1, .1], padding = 5)
-        a_box.add_widget(Button(text='Правила', 
+        a_box.add_widget(Button(text='Лицензия', 
                                   font_size = Window.width / 25,
-                                  on_press=self.rules,
+                                  on_press=self.license,
                                   background_color=self.button_backgound_color,
                                   background_normal='',
                                   pos_hint={"center_x": 0.5, "center_y":0.5}))
